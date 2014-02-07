@@ -45,5 +45,3 @@ var url4data = function(data, name, opts, cb) {
 
 module.exports = url4data;
 
-//console.log(url4data('foo','bar',{type:'text/javascript'}));
-
