@@ -1,6 +1,6 @@
 {
   "name": "url4data",
-  "description": "",
+  "description": "get a URL for the given data",
   "version": "0.0.1",
   "repository": {
     "type": "git",
