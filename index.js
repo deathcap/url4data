@@ -79,12 +79,25 @@ var filesystemURL4data = function(data, name, opts, cb) {
   return createNewFilesystemURL(data, name, opts, cb); // TODO: reuse existing
 }
 
+// TODO: replace with existing data: URL encoder
+var dataURL4data = function(data, name, opts, cb) {
+  var type = opts.type || 'text/javascript';
+  var encodedData = encodeURIComponent(data);
+  var url = 'data:' + type + ',' + encodedData; // TODO: binary data? base64
+
+  cb(url, data, name, opts);
+}
+
 var byScheme = {
   blob: blobURL4data,
   filesystem: filesystemURL4data,
+  data: dataURL4data
 };
 
 var url4data = function(data, name, opts, cb) {
+  if (name === undefined) throw new Error('url4data name is required'); // TODO: hash data?
+  opts = opts || {};
+
   var scheme = opts.scheme || ['filesystem', 'blob'/*TODO , 'data'*/];
   if (!Array.isArray(scheme)) scheme = [scheme];
 
