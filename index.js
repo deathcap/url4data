@@ -4,13 +4,18 @@ var xhr = require('xhr');
 var isValidBlobURL = function(url, cb) {
   if (!url) return cb(url, false);
 
-  xhr({uri: url, sync: true},
-      function(err, resp, body) {
-        console.log('XHR',url,err,resp,body);
+  try {
+    xhr({uri: url, sync: true},
+        function(err, resp, body) {
+          console.log('XHR',url,err,resp,body);
 
-        var valid = !!body && body.length !== 0;
-        cb(url, valid);
-      });
+          var valid = !!body && body.length !== 0;
+          cb(url, valid);
+        });
+  } catch (e) {
+    // Firefox may throw NS_ERROR_DOM_BAD_URI: Access to restricted URI denied
+    cb(url, false);
+  }
 };
 
 
