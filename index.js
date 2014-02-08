@@ -25,7 +25,7 @@ var createNewBlobURL = function(data, name, opts) {
 };
 
 var blobURL4data = function(data, name, opts, cb) {
-  if (!window.Blob) return null; // unsupported
+  if (!window.Blob) return false; // unsupported
 
   var url = window.localStorage[name];
 
@@ -38,10 +38,12 @@ var blobURL4data = function(data, name, opts, cb) {
 
     cb(url, data, name, opts);
   });
+
+  return true;
 }
 
 var createNewFilesystemURL = function(data, name, opts, cb) {
-  if (!window.webkitRequestFileSystem) return null; // unsupported
+  if (!window.webkitRequestFileSystem) return false; // unsupported
 
   var size = data.length;
 
@@ -69,19 +71,33 @@ var createNewFilesystemURL = function(data, name, opts, cb) {
   }, function(err) {
     console.log('webkitRequestFileSystem error:',err);
   });
+
+  return true;
 };
 
 var filesystemURL4data = function(data, name, opts, cb) {
   return createNewFilesystemURL(data, name, opts, cb); // TODO: reuse existing
 }
 
-var url4data = function(data, name, opts, cb) {
-  var scheme = opts.scheme || 'blob'; // TODO: multiple schemes, try available
+var byScheme = {
+  blob: blobURL4data,
+  filesystem: filesystemURL4data,
+};
 
-  if (scheme === 'blob')
-    return blobURL4data(data, name, opts, cb);
-  else if (scheme === 'filesystem')
-    return filesystemURL4data(data, name, opts, cb);
+var url4data = function(data, name, opts, cb) {
+  var scheme = opts.scheme || ['filesystem', 'blob'/*TODO , 'data'*/];
+  if (!Array.isArray(scheme)) scheme = [scheme];
+
+  for (var i = 0; i < scheme.length; ++i) {
+    var tryScheme = scheme[i];
+    var f = byScheme[tryScheme];
+    if (!f) throw new Error('url4data invalid scheme: ' + tryScheme);
+
+    var success = f(data, name, opts, cb);
+    if (success) return; // cb() will be called
+
+    // otherwise, try next available supported scheme
+  }
 };
 
 module.exports = url4data;
