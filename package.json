@@ -1,7 +1,7 @@
 {
   "name": "url4data",
   "description": "get a URL for the given data",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:deathcap/url4data.git"
